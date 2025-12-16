@@ -58,4 +58,4 @@ class CodeGenTrainingConfig:
     def __post_init__(self):
         if self.lora_target_modules is None:
             # Common target modules for causal LM
-            self.lora_target_modules = ["q_proj", "v_proj"]
+            self.lora_target_modules = ["q", "v"]

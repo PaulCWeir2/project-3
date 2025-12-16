@@ -65,7 +65,7 @@ def format_for_chat_template(
     """
     Apply chat template to format instruction + response pairs.
 
-    The dataset has 'instruction' and 'output' fields.
+    The dataset has 'prompt' and 'code' fields.  # ← Updated comment
     We format them as a conversation for the model.
 
     Args:
@@ -77,11 +77,11 @@ def format_for_chat_template(
     """
     formatted_texts = []
 
-    for instruction, output in zip(examples["instruction"], examples["output"]):
+    for instruction, output in zip(examples["instruction"], examples["output"]):  # ← Changed from instruction/output
         # Create a conversation format
         messages = [
-            {"role": "user", "content": instruction},
-            {"role": "assistant", "content": output}
+            {"role": "user", "content": instruction},  # ← Changed from instruction
+            {"role": "assistant", "content": output}  # ← Changed from output
         ]
 
         # Apply chat template if available
@@ -93,7 +93,7 @@ def format_for_chat_template(
             )
         else:
             # Fallback format if no chat template
-            text = f"### Instruction:\n{instruction}\n\n### Response:\n{output}"
+            text = f"### Instruction:\n{instruction}\n\n### Response:\n{output}"  # ← Changed
 
         formatted_texts.append(text)
 

@@ -4,14 +4,14 @@ Training script for Task 2: Code Generation with Mellum + LoRA
 import os
 import torch
 from transformers import (
-    AutoModelForCausalLM,
+    AutoModelForSeq2SeqLM,
     AutoTokenizer,
     TrainingArguments,
 )
 from peft import LoraConfig, get_peft_model, TaskType, prepare_model_for_kbit_training
 from trl import SFTTrainer, SFTConfig
-from config2 import CodeGenTrainingConfig
-from preprocess2 import prepare_code_dataset
+from src.task2_codegen.config2 import CodeGenTrainingConfig  # ← Add src.task2_codegen.
+from src.task2_codegen.preprocess2 import prepare_code_dataset  # ← Add src.task2_codegen.
 import json
 
 
@@ -40,7 +40,7 @@ def setup_lora_model(config: CodeGenTrainingConfig):
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
     # Load base model
-    model = AutoModelForCausalLM.from_pretrained(
+    model = AutoModelForSeq2SeqLM.from_pretrained(  # ← Change from AutoModelForCausalLM
         config.model_name,
         cache_dir=config.cache_dir,
         torch_dtype=torch.float16 if config.fp16 else torch.float32,
@@ -54,7 +54,7 @@ def setup_lora_model(config: CodeGenTrainingConfig):
 
     # Configure LoRA
     lora_config = LoraConfig(
-        task_type=TaskType.CAUSAL_LM,
+        task_type=TaskType.SEQ_2_SEQ_LM,
         r=config.lora_r,
         lora_alpha=config.lora_alpha,
         lora_dropout=config.lora_dropout,
@@ -110,7 +110,7 @@ def train_code_generation_model(config: CodeGenTrainingConfig):
         fp16=config.fp16 and torch.cuda.is_available(),
         report_to=["tensorboard"],
         seed=config.seed,
-        max_seq_length=config.max_seq_length,
+        #max_seq_length=config.max_seq_length,
         dataset_text_field="text",  # The field containing formatted text
         packing=False,  # Don't pack multiple examples together
     )

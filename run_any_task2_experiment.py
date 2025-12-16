@@ -156,7 +156,7 @@ if train_size == 0 and lora_r == 0:
 else:
     # Regular training experiment
     from src.task2_codegen.config2 import CodeGenTrainingConfig
-    from src.task2_codegen.train2 import train_codegen_model
+    from src.task2_codegen.train2 import train_code_generation_model
 
     config = CodeGenTrainingConfig(
         model_name="Salesforce/codet5-small",
@@ -182,7 +182,7 @@ else:
         save_steps=200,
 
         # Data settings
-        dataset_name="mbpp",
+        dataset_name="flytech/python-codes-25k",
 
         seed=42,
         fp16=True,
@@ -195,7 +195,7 @@ else:
     print()
 
     # Train
-    trainer, datasets = train_codegen_model(config)
+    trainer, datasets = train_code_generation_model(config)
 
     print("\n" + "=" * 70)
     print("TRAINING COMPLETE! Starting evaluation...")
