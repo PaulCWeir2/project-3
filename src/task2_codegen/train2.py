@@ -4,14 +4,14 @@ Training script for Task 2: Code Generation with Mellum + LoRA
 import os
 import torch
 from transformers import (
-    AutoModelForSeq2SeqLM,
+    AutoModelForCausalLM,  # ← CHANGED: Use CausalLM, not Seq2SeqLM
     AutoTokenizer,
     TrainingArguments,
 )
 from peft import LoraConfig, get_peft_model, TaskType, prepare_model_for_kbit_training
 from trl import SFTTrainer, SFTConfig
-from src.task2_codegen.config2 import CodeGenTrainingConfig  # ← Add src.task2_codegen.
-from src.task2_codegen.preprocess2 import prepare_code_dataset  # ← Add src.task2_codegen.
+from src.task2_codegen.config2 import CodeGenTrainingConfig
+from src.task2_codegen.preprocess2 import prepare_code_dataset
 import json
 
 
@@ -39,8 +39,8 @@ def setup_lora_model(config: CodeGenTrainingConfig):
         tokenizer.pad_token = tokenizer.eos_token
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    # Load base model
-    model = AutoModelForSeq2SeqLM.from_pretrained(  # ← Change from AutoModelForCausalLM
+    # Load base model - CHANGED: Use AutoModelForCausalLM
+    model = AutoModelForCausalLM.from_pretrained(
         config.model_name,
         cache_dir=config.cache_dir,
         torch_dtype=torch.float16 if config.fp16 else torch.float32,
@@ -52,9 +52,9 @@ def setup_lora_model(config: CodeGenTrainingConfig):
     model.config.use_cache = False
     model.config.pretraining_tp = 1
 
-    # Configure LoRA
+    # Configure LoRA - CHANGED: Use CAUSAL_LM task type
     lora_config = LoraConfig(
-        task_type=TaskType.SEQ_2_SEQ_LM,
+        task_type=TaskType.CAUSAL_LM,  # ← CHANGED from SEQ_2_SEQ_LM
         r=config.lora_r,
         lora_alpha=config.lora_alpha,
         lora_dropout=config.lora_dropout,
@@ -110,9 +110,9 @@ def train_code_generation_model(config: CodeGenTrainingConfig):
         fp16=config.fp16 and torch.cuda.is_available(),
         report_to=["tensorboard"],
         seed=config.seed,
-        #max_seq_length=config.max_seq_length,
-        dataset_text_field="text",  # The field containing formatted text
-        packing=False,  # Don't pack multiple examples together
+        max_seq_length=config.max_seq_length,  # ← UNCOMMENTED
+        dataset_text_field="text",
+        packing=False,
     )
 
     # Initialize SFTTrainer
