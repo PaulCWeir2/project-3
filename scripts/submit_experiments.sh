@@ -10,6 +10,8 @@
 export TMPDIR=$PWD/.uv_tmp
 export UV_CACHE_DIR=$PWD/.uv_cache
 export HF_HOME=$PWD/.hf_cache
+# FIX: Add the src folders to the Python Path so imports work naturally
+export PYTHONPATH=$PYTHONPATH:$PWD:$PWD/src/task1_qa:$PWD/src/task2_codegen
 
 # 2. Determine Task Type
 if [ $SLURM_ARRAY_TASK_ID -lt 7 ]; then
