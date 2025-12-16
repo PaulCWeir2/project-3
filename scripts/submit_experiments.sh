@@ -17,38 +17,48 @@ if [ $SLURM_ARRAY_TASK_ID -lt 7 ]; then
     T_IDX=$SLURM_ARRAY_TASK_ID
     TRAIN_SCRIPT="src.task1_qa.train1"
     EVAL_SCRIPT="src.task1_qa.evaluate1"
+    BASE_MODEL="roberta-base"
 else
     TASK="task2"
     T_IDX=$((SLURM_ARRAY_TASK_ID - 7))
     TRAIN_SCRIPT="src.task2_codegen.train2"
     EVAL_SCRIPT="src.task2_codegen.evaluate2"
+    # Update this path if your Task 2 base model is stored elsewhere
+    BASE_MODEL="mellum"
 fi
 
 # 3. Map T_IDX (0-6) to specific Experiment Params
-# Default values
 FRAC=1.0
 RANK=8
 IS_BASELINE=false
 
 case $T_IDX in
-    0) IS_BASELINE=true ;;
+    0) IS_BASELINE=true; RANK=0 ;; # Setting rank 0 for baseline folder naming
     1) FRAC=0.3 ;;
     2) FRAC=0.5 ;;
-    3) FRAC=1.0 ;; # (Note: This is redundant with Rank=8, but completes the set)
+    3) FRAC=1.0 ;;
     4) RANK=4 ;;
-    5) RANK=8 ;; # (Note: This is redundant with Frac=1.0, but completes the set)
+    5) RANK=8 ;;
     6) RANK=16 ;;
 esac
 
+# Create a unique output directory for every experiment
 OUT_DIR="outputs/${TASK}_exp${T_IDX}_f${FRAC}_r${RANK}"
+mkdir -p "$OUT_DIR"
 
 # 4. Execution
 if [ "$IS_BASELINE" = true ]; then
-    echo "Running $TASK Baseline (No Fine-tuning)"
-    # For baseline, we skip training and evaluate the base model name directly
-    uv run python -m $EVAL_SCRIPT --model_path "roberta-base" # Adjust if Task 2 needs Mellum
+    echo "Running $TASK Baseline (No Fine-tuning) using $BASE_MODEL"
+    # Skip training, evaluate the raw pre-trained model directly
+    # The output of this will now be saved in its own exp0 folder
+    uv run python -m $EVAL_SCRIPT --model_path "$BASE_MODEL"
 else
     echo "Running $TASK: Frac=$FRAC, Rank=$RANK"
-    uv run python -m $TRAIN_SCRIPT --frac $FRAC --rank $RANK --output_dir $OUT_DIR
-    uv run python -m $EVAL_SCRIPT --model_path $OUT_DIR
+    echo "Saving results to: $OUT_DIR"
+
+    # Run training and save to the unique directory
+    uv run python -m $TRAIN_SCRIPT --frac $FRAC --rank $RANK --output_dir "$OUT_DIR"
+
+    # Run evaluation on the weights we just saved in OUT_DIR
+    uv run python -m $EVAL_SCRIPT --model_path "$OUT_DIR"
 fi
