@@ -197,6 +197,33 @@ else:
     trainer, datasets = train_qa_model(config)
 
     print("\n" + "=" * 70)
+    print("TRAINING COMPLETE! Starting evaluation...")
+    print("=" * 70)
+
+    # Evaluate the trained model
+    from src.task1_qa.evaluate1 import evaluate_qa_model, save_evaluation_results
+    from transformers import AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+
+    print(f"\nEvaluating model on {len(datasets['test'])} test examples...")
+    results, preds, truths = evaluate_qa_model(
+        model_path=config.output_dir,
+        test_dataset=datasets['test'],
+        tokenizer=tokenizer,
+        is_peft=True
+    )
+
+    # Save evaluation results
+    save_evaluation_results(
+        results,
+        preds,
+        truths,
+        os.path.join(config.output_dir, "evaluation_results.json")
+    )
+
+    print("\n" + "=" * 70)
     print(f"EXPERIMENT '{exp_name}' COMPLETE!")
     print(f"Model saved to: {config.output_dir}")
+    print(f"Exact Match: {results['exact_match']:.2f}%")
     print("=" * 70)

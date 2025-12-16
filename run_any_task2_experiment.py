@@ -198,6 +198,31 @@ else:
     trainer, datasets = train_codegen_model(config)
 
     print("\n" + "=" * 70)
+    print("TRAINING COMPLETE! Starting evaluation...")
+    print("=" * 70)
+
+    # Evaluate the trained model using evaluate2.py
+    from src.task2_codegen.evaluate2 import evaluate_code_generation, save_evaluation_results
+
+    print(f"\nEvaluating model on test dataset...")
+    metrics, results = evaluate_code_generation(
+        model_path=config.output_dir,
+        test_dataset=datasets['test'],
+        config=config,
+        tokenizer=None,  # Will load from model_path
+        is_peft=True
+    )
+
+    # Save evaluation results
+    save_evaluation_results(
+        metrics,
+        results,
+        os.path.join(config.output_dir, "evaluation_results.json")
+    )
+
+    print("\n" + "=" * 70)
     print(f"EXPERIMENT '{exp_name}' COMPLETE!")
     print(f"Model saved to: {config.output_dir}")
+    print(f"BLEU Score: {metrics['average_bleu']:.4f}")
+    print(f"Execution Success: {metrics['execution_success_rate']:.2f}%")
     print("=" * 70)
