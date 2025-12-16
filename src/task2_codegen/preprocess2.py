@@ -106,18 +106,10 @@ def prepare_code_dataset(
 ) -> DatasetDict:
     """
     Main function to prepare the code generation dataset.
-
-    Args:
-        config: CodeGenTrainingConfig object
-        tokenizer: Tokenizer (will be loaded if not provided)
-
-    Returns:
-        Preprocessed DatasetDict
     """
     if tokenizer is None:
         tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 
-    # Ensure tokenizer has pad token
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
@@ -132,11 +124,19 @@ def prepare_code_dataset(
         cache_dir=config.cache_dir
     )
 
+    # ADD THIS DEBUG
+    print(f"DEBUG: Train size before fraction: {len(dataset['train'])}")
+
     # Apply train size fraction if specified
     if config.train_size_fraction < 1.0:
         train_size = int(len(dataset["train"]) * config.train_size_fraction)
         dataset["train"] = dataset["train"].select(range(train_size))
         print(f"Using {config.train_size_fraction * 100}% of training data: {train_size} examples")
+
+    # ADD THIS DEBUG
+    print(f"DEBUG: Train size after fraction: {len(dataset['train'])}")
+    print(f"DEBUG: Sample instruction: {dataset['train'][0]['instruction'][:100]}")
+    print(f"DEBUG: Sample output: {dataset['train'][0]['output'][:100]}")
 
     # Format for chat template
     print("Formatting dataset with chat template...")
@@ -148,6 +148,10 @@ def prepare_code_dataset(
             batched=True,
             desc=f"Formatting {split} set"
         )
+        # ADD THIS DEBUG
+        print(f"DEBUG: Formatted {split} size: {len(formatted_dataset[split])}")
+        if len(formatted_dataset[split]) > 0:
+            print(f"DEBUG: Sample formatted text from {split}: {formatted_dataset[split][0]['text'][:200]}")
 
     print("Dataset preparation complete!")
     return formatted_dataset
