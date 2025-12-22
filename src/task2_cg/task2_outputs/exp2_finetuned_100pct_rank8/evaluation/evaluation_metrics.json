@@ -1,0 +1,7 @@
+{
+  "num_samples": 1000,
+  "average_bleu": 0.24156493557760855,
+  "execution_success_rate": 0.571,
+  "num_executable": 571,
+  "num_failed": 429
+}

@@ -82,23 +82,12 @@ def load_and_prepare_dataset(dataset_name, cache_dir, train_size=1.0, seed=42):
 
 
 def formatting_prompts_func(example):
-    """
-    Format the dataset examples for code completion
-    The dataset has 'instruction', 'input', and 'output' fields
-    Format: instruction + input (if present) followed by the Python code output
-    """
-    output_texts = []
-    for i in range(len(example['instruction'])):
-        # Combine instruction and input (input is often empty or very short)
-        prompt = example['instruction'][i]
-        if example['input'][i].strip():  # Only add input if it's not empty
-            prompt = f"{prompt} {example['input'][i]}"
-
-        # Format as: prompt followed by code block
-        text = f"{prompt}\n```python\n{example['output'][i]}\n```"
-        output_texts.append(text)
-    return output_texts
-
+    """Format dataset examples for code completion"""
+    prompt = example['instruction']
+    if example['input'] and example['input'].strip():
+        prompt = f"{prompt} {example['input']}"
+    
+    return f"{prompt}\n```python\n{example['output']}\n```"
 
 def main():
     args = parse_args()
@@ -142,7 +131,7 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name,
         cache_dir=args.cache_dir,
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
         device_map="auto",
         trust_remote_code=True
     )
@@ -179,7 +168,7 @@ def main():
         logging_steps=args.logging_steps,
         save_steps=args.save_steps,
         eval_steps=args.eval_steps,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         save_strategy="steps",
         save_total_limit=2,
         load_best_model_at_end=True,
@@ -197,9 +186,7 @@ def main():
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
-        tokenizer=tokenizer,
         formatting_func=formatting_prompts_func,
-        max_seq_length=args.max_seq_length,
     )
 
     # Train

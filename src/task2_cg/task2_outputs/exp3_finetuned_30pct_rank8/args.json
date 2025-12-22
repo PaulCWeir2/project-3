@@ -1,0 +1,22 @@
+{
+  "model_name": "JetBrains/Mellum-4b-base",
+  "dataset_name": "flytech/python-codes-25k",
+  "output_dir": "./task2_outputs",
+  "cache_dir": "./cache",
+  "train_size": 0.3,
+  "lora_rank": 8,
+  "lora_alpha": 16,
+  "lora_dropout": 0.1,
+  "max_seq_length": 1024,
+  "num_train_epochs": 3,
+  "per_device_train_batch_size": 1,
+  "per_device_eval_batch_size": 4,
+  "gradient_accumulation_steps": 16,
+  "learning_rate": 0.0002,
+  "seed": 42,
+  "logging_steps": 10,
+  "save_steps": 500,
+  "eval_steps": 500,
+  "use_lora": true,
+  "experiment_name": "exp3_finetuned_30pct_rank8"
+}

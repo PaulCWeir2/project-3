@@ -3,7 +3,7 @@
 #SBATCH --output=logs/task2_all_%j.out
 #SBATCH --error=logs/task2_all_%j.err
 #SBATCH --time=48:00:00
-#SBATCH --partition=gpu
+#SBATCH --partition=regular
 #SBATCH --gres=gpu:1
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
@@ -41,7 +41,7 @@ EXP_NAME="exp1_pretrained"
 EXP_DIR="${OUTPUT_DIR}/${EXP_NAME}"
 
 # Create a dummy training to get test dataset (we won't actually train)
-python task2_train.py \
+uv run python task2_train.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --cache_dir ${CACHE_DIR} \
@@ -58,7 +58,7 @@ python task2_train.py \
     --eval_steps 1000000
 
 # Evaluate pretrained model
-python task2_eval.py \
+uv run python task2_eval.py \
     --model_path ${MODEL_NAME} \
     --base_model ${MODEL_NAME} \
     --test_dataset_path "${EXP_DIR}/test_dataset.json" \
@@ -80,7 +80,7 @@ echo "=========================================="
 EXP_NAME="exp2_finetuned_100pct_rank8"
 EXP_DIR="${OUTPUT_DIR}/${EXP_NAME}"
 
-python task2_train.py \
+uv run python task2_train.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --cache_dir ${CACHE_DIR} \
@@ -96,7 +96,7 @@ python task2_train.py \
     --max_seq_length ${MAX_SEQ_LEN} \
     --use_lora
 
-python task2_eval.py \
+uv run python task2_eval.py \
     --model_path "${EXP_DIR}/final_model" \
     --base_model ${MODEL_NAME} \
     --test_dataset_path "${EXP_DIR}/test_dataset.json" \
@@ -116,7 +116,7 @@ echo "=========================================="
 EXP_NAME="exp3_finetuned_30pct_rank8"
 EXP_DIR="${OUTPUT_DIR}/${EXP_NAME}"
 
-python task2_train.py \
+uv run python task2_train.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --cache_dir ${CACHE_DIR} \
@@ -132,7 +132,7 @@ python task2_train.py \
     --max_seq_length ${MAX_SEQ_LEN} \
     --use_lora
 
-python task2_eval.py \
+uv run python task2_eval.py \
     --model_path "${EXP_DIR}/final_model" \
     --base_model ${MODEL_NAME} \
     --test_dataset_path "${EXP_DIR}/test_dataset.json" \
@@ -152,7 +152,7 @@ echo "=========================================="
 EXP_NAME="exp4_finetuned_50pct_rank8"
 EXP_DIR="${OUTPUT_DIR}/${EXP_NAME}"
 
-python task2_train.py \
+uv run python task2_train.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --cache_dir ${CACHE_DIR} \
@@ -168,7 +168,7 @@ python task2_train.py \
     --max_seq_length ${MAX_SEQ_LEN} \
     --use_lora
 
-python task2_eval.py \
+uv run python task2_eval.py \
     --model_path "${EXP_DIR}/final_model" \
     --base_model ${MODEL_NAME} \
     --test_dataset_path "${EXP_DIR}/test_dataset.json" \
@@ -188,7 +188,7 @@ echo "=========================================="
 EXP_NAME="exp5_finetuned_100pct_rank4"
 EXP_DIR="${OUTPUT_DIR}/${EXP_NAME}"
 
-python task2_train.py \
+uv run python task2_train.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --cache_dir ${CACHE_DIR} \
@@ -204,7 +204,7 @@ python task2_train.py \
     --max_seq_length ${MAX_SEQ_LEN} \
     --use_lora
 
-python task2_eval.py \
+uv run python task2_eval.py \
     --model_path "${EXP_DIR}/final_model" \
     --base_model ${MODEL_NAME} \
     --test_dataset_path "${EXP_DIR}/test_dataset.json" \
@@ -224,7 +224,7 @@ echo "=========================================="
 EXP_NAME="exp6_finetuned_100pct_rank16"
 EXP_DIR="${OUTPUT_DIR}/${EXP_NAME}"
 
-python task2_train.py \
+uv run python task2_train.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --cache_dir ${CACHE_DIR} \
@@ -240,7 +240,7 @@ python task2_train.py \
     --max_seq_length ${MAX_SEQ_LEN} \
     --use_lora
 
-python task2_eval.py \
+uv run python task2_eval.py \
     --model_path "${EXP_DIR}/final_model" \
     --base_model ${MODEL_NAME} \
     --test_dataset_path "${EXP_DIR}/test_dataset.json" \
@@ -260,7 +260,7 @@ echo "=========================================="
 EXP_NAME="exp7_finetuned_100pct_rank32"
 EXP_DIR="${OUTPUT_DIR}/${EXP_NAME}"
 
-python task2_train.py \
+uv run python task2_train.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --cache_dir ${CACHE_DIR} \
@@ -276,7 +276,7 @@ python task2_train.py \
     --max_seq_length ${MAX_SEQ_LEN} \
     --use_lora
 
-python task2_eval.py \
+uv run python task2_eval.py \
     --model_path "${EXP_DIR}/final_model" \
     --base_model ${MODEL_NAME} \
     --test_dataset_path "${EXP_DIR}/test_dataset.json" \
@@ -293,7 +293,7 @@ echo "=========================================="
 echo "Generating Summary Report"
 echo "=========================================="
 
-python task2_generate_report.py \
+uv run python task2_generate_report.py \
     --output_dir ${OUTPUT_DIR} \
     --report_path "${OUTPUT_DIR}/task2_summary_report.md"
 
